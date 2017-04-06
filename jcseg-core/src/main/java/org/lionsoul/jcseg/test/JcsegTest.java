@@ -40,6 +40,14 @@ public class JcsegTest
     KeyphraseExtractor keyphraseExtractor = null;   // 短语
     SummaryExtractor summaryExtractor = null;       // 摘要
     
+
+    /**
+     * 构造函数
+     *  1、实例化tokenizerConfig 分解器配置对象
+     *  2、获取 extractorConfig 提取器的实例句柄
+     *  3、实例化 dic 字典实例
+     *  4、 
+     */
     public JcsegTest() throws JcsegException, IOException, CloneNotSupportedException {
     	
         tokenizerConfig = new JcsegTaskConfig(true);// 实例化分解器
@@ -49,7 +57,6 @@ public class JcsegTest
         //reset the options from a property file.
         //config.load("/java/JavaSE/jcseg/jcseg.properties");
         
-        //ADictionary dic = DictionaryFactory.createDefaultDictionary(tokenizerConfig);
         dic = DictionaryFactory.createSingletonDictionary(tokenizerConfig); //字典实例
         
         //two ways to reload lexicons
@@ -84,8 +91,8 @@ public class JcsegTest
         System.out.println("jcseg参数设置：");
         System.out.println("当前加载的配置文件："+tokenizerConfig.getPropertieFile());
         System.out.println("最大切分匹配词数："+tokenizerConfig.MAX_LENGTH);
-        /*System.out.println("最大混合中文长度："+tokenizerConfig.MIX_CN_LENGTH);
-        System.out.println("开启中文人名识别："+tokenizerConfig.I_CN_NAME);
+    //    System.out.println("最大混合中文长度："+tokenizerConfig.MIX_CN_LENGTH);
+       /* System.out.println("开启中文人名识别："+tokenizerConfig.I_CN_NAME);
         System.out.println("最大姓氏前缀修饰："+tokenizerConfig.MAX_CN_LNADRON);
         System.out.println("最大标点配对词长："+tokenizerConfig.PPT_MAX_LENGTH);
         System.out.println("词库词条拼音加载："+tokenizerConfig.LOAD_CJK_PINYIN);
@@ -101,155 +108,8 @@ public class JcsegTest
         System.out.println("姓名成词歧义阕值："+tokenizerConfig.NAME_SINGLE_THRESHOLD+"\n");*/
     }
     
-    /**
-     * string tokenize handler
-     * 字符串分解器处理器
-     * @param str
-    */
-    public void tokenize(String str) throws IOException 
-    {
-        StringBuffer sb = new StringBuffer();
-        //seg.setLastRule(null);
-        IWord word = null;
-        
-        long _start = System.nanoTime();
-        boolean isFirst = true, entity = (tokenizerSeg instanceof NLPSeg);
-        int counter = 0;
-        tokenizerSeg.reset(new StringReader(str));
-        while ( (word = tokenizerSeg.next()) != null ) {
-            if ( isFirst ) {
-                sb.append(word.getValue());
-                isFirst = false;
-            } else {
-                sb.append(" ");
-                sb.append(word.getValue());
-            }
-            
-            //----for testing append word position and length
-            /*sb.append("[");
-            sb.append(word.getPosition());
-            sb.append("/");
-            sb.append(word.getLength());
-            sb.append("]");*/
-            
-            //append the part of the speech
-            if ( word.getPartSpeech() != null ) {
-                sb.append('/');
-                sb.append(word.getPartSpeech()[0]);
-            }
-            
-            //check and append the entity recognition
-            if ( entity ) {
-                sb.append('/');
-                sb.append(word.getEntity());
-            }
-            
-            //clear the allocations of the word.
-            word = null;
-            counter++;
-        }
-        
-        long e = System.nanoTime();
-        System.out.println("分词结果：");
-        System.out.println(sb.toString());
-        System.out.format("Done, total:"
-                + tokenizerSeg.getStreamPosition()+", tokens:" +
-                + counter + ", in %.5fsec\n", ((float)e - _start)/1E9);
-    }
-    
-    
-    /**
-     * 切换中文分词模式
-     * @param mode
-     * @throws JcsegException
-     */
-    public void resetMode( int mode ) throws JcsegException
-    {
-        tokenizerSeg = SegmentFactory.createJcseg(
-            mode, 
-            //new Object[]{tokenizerConfig, mode==JcsegTaskConfig.DELIMITER_MODE ? null : dic}
-            new Object[]{tokenizerConfig, dic}
-        );
-    }
-    
-    /**
-     * keywords extractor
-     * 关键字提取器
-     * @param   str
-     * @throws  IOException 
-    */
-    public void keywords(String str) throws IOException
-    {
-        long _start = System.nanoTime();
-        List<String> keywords = keywordsExtractor.getKeywordsFromString(str);
-        long e = System.nanoTime();
-        System.out.println("Top10关键词：");
-        System.out.println(keywords);
-        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
-    }
-    
-    /**
-     * keyphrase extractor
-     * 关键短语提取器
-     * @param   str
-     * @throws  IOException 
-    */
-    public void keyphrase(String str) throws IOException
-    {
-        long _start = System.nanoTime();
-        List<String> keyphrase = keyphraseExtractor.getKeyphraseFromString(str);
-        long e = System.nanoTime();
-        System.out.println("Top10关键短语：");
-        System.out.println(keyphrase);
-        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
-    }
-    
-    /**
-     * key sentence extractor
-     * 关键句子提取器
-     * @param   str
-     * @throws  IOException 
-    */
-    public void sentence(String str) throws IOException
-    {
-        long _start = System.nanoTime();
-        List<String> sentence = summaryExtractor.getKeySentenceFromString(str);
-        long e = System.nanoTime();
-        System.out.println("Top6相关句子：");
-        //System.out.println(sentence);
-        System.out.println("+-Key sentence: ");
-        int count = 1;
-        for ( String sen : sentence ) {
-            System.out.println(count + ": " + sen);
-            count++;
-        }
-        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
-    }
-    
-    /**
-     * summary extractor
-     * 摘要提取器
-     * @param   str
-     * @throws  IOException 
-    */
-    public void summary(String str) throws IOException
-    {
-        long _start = System.nanoTime();
-        String summary = summaryExtractor.getSummaryFromString(str, 86);
-        long e = System.nanoTime();
-        System.out.println("摘要结果：");
-        System.out.println(summary);
-        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
-    }
 
-    /**
-     * @param  args
-     * @throws JcsegException 
-     * @throws IOException
-     * @throws CloneNotSupportedException 
-     */
-    public static void main(String[] args) throws JcsegException, IOException, CloneNotSupportedException 
-    {
+    public static void main(String[] args) throws JcsegException, IOException, CloneNotSupportedException {
         String str = "歧义和同义词:研究生命起源，" +
                 "混合词: 做B超检查身体，x射线本质是什么，今天去奇都ktv唱卡拉ok去，哆啦a梦是一个动漫中的主角，" +
                 "单位和全角: 2009年８月６日开始大学之旅，岳阳今天的气温为38.6℃, 也就是101.48℉, " +
@@ -260,8 +120,8 @@ public class JcsegTest
                 "特殊字母: 【Ⅰ】（Ⅱ），" +
                 "英文数字: bug report chenxin619315@gmail.com or visit http://code.google.com/p/jcseg, we all admire the hacker spirit!" +
                 "特殊数字: ① ⑩ ⑽ ㈩.";
-        //str = "这是张三和李四一九九七年前的故事了。";
-        //str = "本次“畅想杯黑客技术大赛”的冠军为“电信09-2BF”的陈鑫。奖励《算法导论》一书，加上『畅想网络PHP教程』一套";
+         str = "这是张三和李四一九九七年前的故事了。";
+         str = "本次“畅想杯黑客技术大赛”的冠军为“电信09-2BF”的陈鑫。奖励《算法导论》一书，加上『畅想网络PHP教程』一套";
         //str = "我很喜欢陈述高的演讲。我很不喜欢陈述高调的样子。";
         //str = "学习宣传林俊德同志的先进事迹";
         //str = "每年的五四青年节都让我们想起了过去的五四运动，《Java编程思想》五折亏本卖。";
@@ -269,14 +129,16 @@ public class JcsegTest
         //str = "关于这个软件的盈利我们六四分之也就是我拿十分之六剩下的给你, 你觉得怎么样?";
         
         int action = 0;
-        String cmd = null, module = "tokenizer:complex";
+        String cmd = null;
+        String module = "tokenizer:complex";
+        module = "tokenizer:keywords";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         JcsegTest demo = new JcsegTest();
         System.out.println(str);
         try {
             demo.tokenize(str);
             printHelpMenu();
-            do {
+            do {//
                 System.out.print("jcseg~" + module +">> ");
                 cmd = reader.readLine();
                 if ( cmd == null ) break;
@@ -350,14 +212,13 @@ public class JcsegTest
                     }
                 }
             
-                //segment
-                switch ( action )
-                {
-                case 0: demo.tokenize(cmd); break;
-                case 1: demo.keywords(cmd); break;
-                case 2: demo.keyphrase(cmd);break;
-                case 3: demo.sentence(cmd); break;
-                case 4: demo.summary(cmd);  break;
+                //segment 
+                switch ( action ){
+                  case 0: demo.tokenize(cmd); break;
+                  case 1: demo.keywords(cmd); break;
+                  case 2: demo.keyphrase(cmd);break;
+                  case 3: demo.sentence(cmd); break;
+                  case 4: demo.summary(cmd);  break;
                 }
             } while ( true );
         } catch (IOException e) {
@@ -367,8 +228,151 @@ public class JcsegTest
         System.out.println("Bye!");
     }
     
-    static void printHelpMenu()
+    
+    /**
+     * string tokenize handler
+     * 字符串分解器处理器
+     * @param str
+    */
+    public void tokenize(String str) throws IOException 
     {
+        StringBuffer sb = new StringBuffer();
+        //seg.setLastRule(null);
+        IWord word = null;
+        
+        long _start = System.nanoTime();
+        boolean isFirst = true;
+        boolean	entity = (tokenizerSeg instanceof NLPSeg);
+        int counter = 0;
+        tokenizerSeg.reset(new StringReader(str));
+        while ( (word = tokenizerSeg.next()) != null ) {
+            if ( isFirst ) {
+                sb.append(word.getValue());
+                isFirst = false;
+            } else {
+                sb.append(" ");
+                sb.append(word.getValue());
+            }
+            
+            //----for testing append word position and length
+            sb.append("[");
+            sb.append(word.getPosition());
+            sb.append("/");
+            sb.append(word.getLength());
+            sb.append("]");
+            
+            //append the part of the speech
+            if (word.getPartSpeech() != null ) {
+                sb.append('/');
+                sb.append(word.getPartSpeech()[0]);
+               // System.out.println("partSpeech = " + word.getPartSpeech()[0]);
+            }
+            //check and append the entity recognition
+            if (entity) {  //添加中文分词识别标志
+                sb.append('/');
+                sb.append(word.getEntity());
+                System.out.println("entity = " + word.getEntity());
+            }
+            
+            //clear the allocations of the word.
+            word = null;
+            counter++;
+        }
+        
+        long e = System.nanoTime();
+        System.out.println("分词结果：");
+        System.out.println(sb.toString());
+        System.out.format("Done, total:"
+                + tokenizerSeg.getStreamPosition()+", tokens:" +
+                + counter + ", in %.5fsec\n", ((float)e - _start)/1E9);
+    }
+    
+    
+    /**
+     * 切换中文分词模式
+     * @param mode
+     */
+    public void resetMode( int mode ) throws JcsegException
+    {
+        tokenizerSeg = SegmentFactory.createJcseg(
+            mode, 
+            //new Object[]{tokenizerConfig, mode==JcsegTaskConfig.DELIMITER_MODE ? null : dic}
+            new Object[]{tokenizerConfig, dic}
+        );
+    }
+    
+    /**
+     * keywords extractor
+     * 关键字提取器
+    */
+    public void keywords(String str) throws IOException
+    {
+        long _start = System.nanoTime();
+        List<String> keywords = keywordsExtractor.getKeywordsFromString(str);
+        long e = System.nanoTime();
+        System.out.println("Top10关键词：");
+        System.out.println(keywords);
+        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
+    }
+    
+    /**
+     * keyphrase extractor
+     * 关键短语提取器
+     * @param   str
+     * @throws  IOException 
+    */
+    public void keyphrase(String str) throws IOException
+    {
+        long _start = System.nanoTime();
+        List<String> keyphrase = keyphraseExtractor.getKeyphraseFromString(str);
+        long e = System.nanoTime();
+        System.out.println("Top10关键短语：");
+        System.out.println(keyphrase);
+        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
+    }
+    
+    /**
+     * key sentence extractor
+     * 关键句子提取器
+     * @param   str
+     * @throws  IOException 
+    */
+    public void sentence(String str) throws IOException
+    {
+        long _start = System.nanoTime();
+        List<String> sentence = summaryExtractor.getKeySentenceFromString(str);
+        long e = System.nanoTime();
+        System.out.println("Top6相关句子：");
+        //System.out.println(sentence);
+        System.out.println("+-Key sentence: ");
+        int count = 1;
+        for ( String sen : sentence ) {
+            System.out.println(count + ": " + sen);
+            count++;
+        }
+        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
+    }
+    
+    /**
+     * summary extractor
+     * 摘要提取器
+     * @param   str
+     * @throws  IOException 
+    */
+    public void summary(String str) throws IOException
+    {
+        long _start = System.nanoTime();
+        String summary = summaryExtractor.getSummaryFromString(str, 86);
+        long e = System.nanoTime();
+        System.out.println("摘要结果：");
+        System.out.println(summary);
+        System.out.format("Done in %.5fsec\n", ((float)e - _start)/1E9);
+    }
+
+    
+    
+    static void printHelpMenu(){
+    	
         System.out.println("+--------Jcseg chinese word tokenizer demo---------------+");
         System.out.println("|- @Author chenxin<chenxin619315@gmail.com>              |");
         System.out.println("|- :seg_mode  : switch to specified tokenizer mode.      |");
