@@ -64,8 +64,8 @@ public class SpeedTest {
     /**
      * @param args
      */
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
+    	
         String filename = "/java/products/jcseg_o/article/article";
         if (  args.length >= 1 ) 
             filename = args[0];

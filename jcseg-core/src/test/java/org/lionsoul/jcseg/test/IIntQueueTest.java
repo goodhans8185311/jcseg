@@ -40,8 +40,7 @@ public class IIntQueueTest {
         q.enQueue('D');
         q.enQueue('E');
         
-        while ( q.size() > 0 ) 
-        {
+        while ( q.size() > 0 ) {
             System.out.println((char)q.deQueue()+", size: " + q.size());
         }
     }
