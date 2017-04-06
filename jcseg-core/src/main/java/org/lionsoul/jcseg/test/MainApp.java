@@ -109,126 +109,6 @@ public class MainApp
     }
     
 
-    public static void main(String[] args) throws JcsegException, IOException, CloneNotSupportedException {
-        String str = "歧义和同义词:研究生命起源，" +
-                "混合词: 做B超检查身体，x射线本质是什么，今天去奇都ktv唱卡拉ok去，哆啦a梦是一个动漫中的主角，" +
-                "单位和全角: 2009年８月６日开始大学之旅，岳阳今天的气温为38.6℃, 也就是101.48℉, " +
-                "中文数字/分数: 你分三十分之二, 小陈拿三十分之五,剩下的三十分之二十三全部是我的，那是一九九八年前的事了，四川麻辣烫很好吃，五四运动留下的五四精神。笔记本五折包邮亏本大甩卖。"+
-                "人名识别: 我是陈鑫，也是jcseg的作者，三国时期的诸葛亮是个天才，我们一起给刘翔加油，罗志高兴奋极了因为老吴送了他一台笔记本。" +
-                "冰岛时间7月1日，正在当地拍片的汤姆·克鲁斯通过发言人承认，他与第三任妻子凯蒂·赫尔墨斯（第一二任妻子分别为咪咪·罗杰斯、妮可·基德曼）的婚姻即将结束。" + 
-                "配对标点: 本次『畅想杯』黑客技术大赛的得主为电信09-2BF的张三，奖励C++程序设计语言一书和【畅想网络】的『PHP教程』一套。"+
-                "特殊字母: 【Ⅰ】（Ⅱ），" +
-                "英文数字: bug report chenxin619315@gmail.com or visit http://code.google.com/p/jcseg, we all admire the hacker spirit!" +
-                "特殊数字: ① ⑩ ⑽ ㈩.";
-         str = "这是张三和李四一九九七年前的故事了。";
-         str = "本次“畅想杯黑客技术大赛”的冠军为“电信09-2BF”的陈鑫。奖励《算法导论》一书，加上『畅想网络PHP教程』一套";
-        //str = "我很喜欢陈述高的演讲。我很不喜欢陈述高调的样子。";
-        //str = "学习宣传林俊德同志的先进事迹";
-        //str = "每年的五四青年节都让我们想起了过去的五四运动，《Java编程思想》五折亏本卖。";
-        //str = "c++编程思想,c#是.net平台的主要开发语言,b超。";
-        //str = "关于这个软件的盈利我们六四分之也就是我拿十分之六剩下的给你, 你觉得怎么样?";
-        
-        int action = 0;
-        String cmd = null;
-        String module = "tokenizer:complex";
-        module = "tokenizer:keywords";
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        MainApp demo = new MainApp();
-        System.out.println(str);
-        try {
-            demo.tokenize(str);
-            printHelpMenu();
-            do {//
-                System.out.print("jcseg~" + module +">> ");
-                cmd = reader.readLine();
-                if ( cmd == null ) break;
-                cmd = cmd.trim();
-                if ( "".equals(cmd) ) continue;
-                
-                //module switch
-                if ( cmd.charAt(0) == ':' ) {
-                    if (":complex".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.COMPLEX_MODE);
-                        module = "tokenzier:complex";
-                        action = 0;
-                        System.out.println("Entered complex tokenize mode!");
-                        continue;
-                    } else if (":simple".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.SIMPLE_MODE);
-                        module = "tokenzier:simple";
-                        action = 0;
-                        System.out.println("Entered simple tokenize mode!");
-                        continue;
-                    } else if (":search".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.SEARCH_MODE);
-                        module = "tokenzier:search";
-                        action = 0;
-                        System.out.println("Entered search tokenize mode!");
-                        continue;
-                    } else if (":detect".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.DETECT_MODE);
-                        module = "tokenzier:detect";
-                        action = 0;
-                        System.out.println("Entered detect tokenize mode!");
-                        continue;
-                    } else if (":delimiter".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.DELIMITER_MODE);
-                        module = "tokenzier:delimiter";
-                        action = 0;
-                        System.out.println("Entered delimiter tokenize mode!");
-                        continue;
-                    } else if (":NLP".equals(cmd)) {
-                        demo.resetMode(JcsegTaskConfig.NLP_MODE);
-                        module = "tokenzier:NLP";
-                        action = 0;
-                        System.out.println("Entered NLP tokenize mode!");
-                        continue;
-                    } else if (":keywords".equals(cmd)) {
-                        module = "keywords";
-                        action = 1;
-                        System.out.println("Entered keywords extract mode!");
-                        continue;
-                    } else if (":keyphrase".equals(cmd)) {
-                        module = "keyphrase";
-                        action = 2;
-                        System.out.println("Entered keyphrase extract mode!");
-                        continue;
-                    } else if (":sentence".equals(cmd)) {
-                        action = 3;
-                        module = "sentence";
-                        System.out.println("Entered sentence extract mode!");
-                        continue;
-                    } else if (":summary".equals(cmd)) {
-                        action = 4;
-                        module = "summary";
-                        System.out.println("Entered summary extract mode!");
-                        continue;
-                    } else if (":help".equals(cmd)) {
-                        printHelpMenu();
-                        continue;
-                    } else if (":quit".equals(cmd)) {
-                        System.out.println("Thanks for trying jcseg, Bye!");
-                        System.exit(0);
-                    }
-                }
-            
-                //segment 
-                switch ( action ){
-                  case 0: demo.tokenize(cmd); break;
-                  case 1: demo.keywords(cmd); break;
-                  case 2: demo.keyphrase(cmd);break;
-                  case 3: demo.sentence(cmd); break;
-                  case 4: demo.summary(cmd);  break;
-                }
-            } while ( true );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        System.out.println("Bye!");
-    }
-    
-    
     /**
      * string tokenize handler
      * 字符串分解器处理器
@@ -286,6 +166,127 @@ public class MainApp
                 + tokenizerSeg.getStreamPosition()+", tokens:" +
                 + counter + ", in %.5fsec\n", ((float)e - _start)/1E9);
     }
+    public static void main(String[] args) throws JcsegException, IOException, CloneNotSupportedException {
+        String str = "歧义和同义词:研究生命起源，" +
+                "混合词: 做B超检查身体，x射线本质是什么，今天去奇都ktv唱卡拉ok去，哆啦a梦是一个动漫中的主角，" +
+                "单位和全角: 2009年８月６日开始大学之旅，岳阳今天的气温为38.6℃, 也就是101.48℉, " +
+                "中文数字/分数: 你分三十分之二, 小陈拿三十分之五,剩下的三十分之二十三全部是我的，那是一九九八年前的事了，四川麻辣烫很好吃，五四运动留下的五四精神。笔记本五折包邮亏本大甩卖。"+
+                "人名识别: 我是陈鑫，也是jcseg的作者，三国时期的诸葛亮是个天才，我们一起给刘翔加油，罗志高兴奋极了因为老吴送了他一台笔记本。" +
+                "冰岛时间7月1日，正在当地拍片的汤姆·克鲁斯通过发言人承认，他与第三任妻子凯蒂·赫尔墨斯（第一二任妻子分别为咪咪·罗杰斯、妮可·基德曼）的婚姻即将结束。" + 
+                "配对标点: 本次『畅想杯』黑客技术大赛的得主为电信09-2BF的张三，奖励C++程序设计语言一书和【畅想网络】的『PHP教程』一套。"+
+                "特殊字母: 【Ⅰ】（Ⅱ），" +
+                "英文数字: bug report chenxin619315@gmail.com or visit http://code.google.com/p/jcseg, we all admire the hacker spirit!" +
+                "特殊数字: ① ⑩ ⑽ ㈩.";
+         str = "这是张三和李四一九九七年前的故事了。";
+         str = "本次“畅想杯黑客技术大赛”的冠军为“电信09-2BF”的陈鑫。奖励《算法导论》一书，加上『畅想网络PHP教程』一套";
+        //str = "我很喜欢陈述高的演讲。我很不喜欢陈述高调的样子。";
+        //str = "学习宣传林俊德同志的先进事迹";
+        //str = "每年的五四青年节都让我们想起了过去的五四运动，《Java编程思想》五折亏本卖。";
+        //str = "c++编程思想,c#是.net平台的主要开发语言,b超。";
+        //str = "关于这个软件的盈利我们六四分之也就是我拿十分之六剩下的给你, 你觉得怎么样?";
+        
+        int action = 0;
+        String cmd = null;
+        String module = "tokenizer:complex";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        MainApp demo = new MainApp();
+        System.out.println(str);
+        try {
+            demo.tokenize(str);
+            printHelpMenu();
+            do {//
+                System.out.print("jcseg~" + module +">> ");
+                cmd = reader.readLine();
+                if ( cmd == null ) break;
+                cmd = cmd.trim();
+                if ( "".equals(cmd) ) continue;
+                
+                //module switch
+                if ( cmd.charAt(0) == ':' ) {
+                    if (":complex".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.COMPLEX_MODE);
+                        module = "tokenzier:complex";
+                        action = 0;
+                        System.out.println("Entered complex tokenize mode!");
+                        continue;
+                    } else if (":simple".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.SIMPLE_MODE);
+                        module = "tokenzier:simple";
+                        action = 0;
+                        System.out.println("Entered simple tokenize mode!");
+                        continue;
+                    } else if (":search".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.SEARCH_MODE);
+                        module = "tokenzier:search";
+                        action = 0;
+                        System.out.println("Entered search tokenize mode!");
+                        continue;
+                    } else if (":detect".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.DETECT_MODE);
+                        module = "tokenzier:detect";
+                        action = 0;
+                        System.out.println("Entered detect tokenize mode!");
+                        continue;
+                    } else if (":delimiter".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.DELIMITER_MODE);
+                        module = "tokenzier:delimiter";
+                        action = 0;
+                        System.out.println("Entered delimiter tokenize mode!");
+                        continue;
+                    } else if (":NLP".equals(cmd)) {
+                        demo.resetMode(JcsegTaskConfig.NLP_MODE);
+                        module = "tokenzier:NLP";
+                        action = 0;
+                        System.out.println("Entered NLP tokenize mode!");
+                        continue;
+                        
+                        
+                    } else if (":keywords".equals(cmd)) {
+                        module = "keywords";
+                        action = 1;
+                        System.out.println("Entered keywords extract mode!");
+                        continue;
+                    } else if (":keyphrase".equals(cmd)) {
+                        module = "keyphrase";
+                        action = 2;
+                        System.out.println("Entered keyphrase extract mode!");
+                        continue;
+                    } else if (":sentence".equals(cmd)) {
+                        action = 3;
+                        module = "sentence";
+                        System.out.println("Entered sentence extract mode!");
+                        continue;
+                    } else if (":summary".equals(cmd)) {
+                        action = 4;
+                        module = "summary";
+                        System.out.println("Entered summary extract mode!");
+                        continue;
+                    } else if (":help".equals(cmd)) {
+                        printHelpMenu();
+                        continue;
+                    } else if (":quit".equals(cmd)) {
+                        System.out.println("Thanks for trying jcseg, Bye!");
+                        System.exit(0);
+                    }
+                }
+            
+                //segment 
+                switch ( action ){
+                  case 0: demo.tokenize(cmd); break;
+                  case 1: demo.keywords(cmd); break;
+                  case 2: demo.keyphrase(cmd);break;
+                  case 3: demo.sentence(cmd); break;
+                  case 4: demo.summary(cmd);  break;
+                }
+            } while ( true );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("Bye!");
+    }
+    
+    
     
     
     /**
