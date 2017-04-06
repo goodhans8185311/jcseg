@@ -30,27 +30,27 @@ import org.lionsoul.jcseg.tokenizer.core.SegmentFactory;
  */
 public class JcsegTest 
 {
-    JcsegTaskConfig tokenizerConfig = null;
-    ADictionary dic = null;
+    JcsegTaskConfig tokenizerConfig = null;  //分解器配置对象
+    ADictionary dic = null;           //字典
     
-    ISegment tokenizerSeg = null;
-    ISegment extractorSeg = null;
+    ISegment tokenizerSeg = null;     //分解器
+    ISegment extractorSeg = null;     //提取器
     
-    KeywordsExtractor keywordsExtractor = null;
-    KeyphraseExtractor keyphraseExtractor = null;
-    SummaryExtractor summaryExtractor = null;
+    KeywordsExtractor keywordsExtractor = null;     // 关键字
+    KeyphraseExtractor keyphraseExtractor = null;   // 短语
+    SummaryExtractor summaryExtractor = null;       // 摘要
     
-    public JcsegTest() throws JcsegException, IOException, CloneNotSupportedException 
-    {
-        tokenizerConfig = new JcsegTaskConfig(true);
-        JcsegTaskConfig extractorConfig = tokenizerConfig.clone();
+    public JcsegTest() throws JcsegException, IOException, CloneNotSupportedException {
+    	
+        tokenizerConfig = new JcsegTaskConfig(true);// 实例化分解器
+        JcsegTaskConfig extractorConfig = tokenizerConfig.clone(); // 获取提取器的实例句柄
         //JcsegTaskConfig config = new JcsegTaskConfig("/java/JavaSE/jcseg/jcseg.properties"); 
         //JcsegTaskConfig config = new JcsegTaskConfig(null);
         //reset the options from a property file.
         //config.load("/java/JavaSE/jcseg/jcseg.properties");
         
         //ADictionary dic = DictionaryFactory.createDefaultDictionary(tokenizerConfig);
-        dic = DictionaryFactory.createSingletonDictionary(tokenizerConfig);
+        dic = DictionaryFactory.createSingletonDictionary(tokenizerConfig); //字典实例
         
         //two ways to reload lexicons
         //for ( String lpath : config.getLexiconPath() )
@@ -103,7 +103,7 @@ public class JcsegTest
     
     /**
      * string tokenize handler
-     * 
+     * 字符串分解器处理器
      * @param str
     */
     public void tokenize(String str) throws IOException 
@@ -157,6 +157,12 @@ public class JcsegTest
                 + counter + ", in %.5fsec\n", ((float)e - _start)/1E9);
     }
     
+    
+    /**
+     * 切换中文分词模式
+     * @param mode
+     * @throws JcsegException
+     */
     public void resetMode( int mode ) throws JcsegException
     {
         tokenizerSeg = SegmentFactory.createJcseg(
@@ -168,7 +174,7 @@ public class JcsegTest
     
     /**
      * keywords extractor
-     * 
+     * 关键字提取器
      * @param   str
      * @throws  IOException 
     */
@@ -184,7 +190,7 @@ public class JcsegTest
     
     /**
      * keyphrase extractor
-     * 
+     * 关键短语提取器
      * @param   str
      * @throws  IOException 
     */
@@ -200,7 +206,7 @@ public class JcsegTest
     
     /**
      * key sentence extractor
-     * 
+     * 关键句子提取器
      * @param   str
      * @throws  IOException 
     */
@@ -222,7 +228,7 @@ public class JcsegTest
     
     /**
      * summary extractor
-     * 
+     * 摘要提取器
      * @param   str
      * @throws  IOException 
     */
